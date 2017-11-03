@@ -3,11 +3,12 @@ package com.mygdx.proj.entity;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.proj.components.*;
 
 public class EnemyEntity extends Entity {
-    public EnemyEntity(float x, float y, Animation<TextureRegion> animation, float width, float height) {
+    public EnemyEntity(float x, float y, Animation<Sprite> animation, float width, float height, int behaviour) {
         RenderComponent render = new RenderComponent();
         render.animation = animation;
         this.add(render);
@@ -25,5 +26,8 @@ public class EnemyEntity extends Entity {
         this.add(hitbox);
 
         this.add(new DestructibleComponent());
+
+        BehaviourComponent behaviourComponent = new BehaviourComponent(behaviour, true);
+        this.add(behaviourComponent);
     }
 }

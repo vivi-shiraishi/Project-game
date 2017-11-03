@@ -2,6 +2,7 @@ package com.mygdx.proj.entity;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.proj.components.DestroyComponent;
 import com.mygdx.proj.components.PositionComponent;
@@ -20,7 +21,7 @@ public class FireEntity extends Entity {
 		this.add(destroy);
 		if (center) {
 			RenderComponent render = new RenderComponent();
-			render.animation = new Animation<>(1f, Textures.bombCenter);
+			render.animation = new Animation<Sprite>(1f, Textures.bombCenter);
 			this.add(render);
 		}
 	}
@@ -30,16 +31,16 @@ public class FireEntity extends Entity {
 		RenderComponent render = new RenderComponent();
 		switch (tip) {
 			case UP:
-				render.animation = new Animation<>(1f, Textures.bombUp);
+				render.animation = new Animation<Sprite>(1f, Textures.bombUp);
 				break;
 			case DOWN:
-				render.animation = new Animation<>(1f, Textures.bombDown);
+				render.animation = new Animation<Sprite>(1f, Textures.bombDown);
 				break;
 			case LEFT:
-				render.animation = new Animation<>(1f, Textures.bombLeft);
+				render.animation = new Animation<Sprite>(1f, Textures.bombLeft);
 				break;
 			case RIGHT:
-				render.animation = new Animation<>(1f, Textures.bombRight);
+				render.animation = new Animation<Sprite>(1f, Textures.bombRight);
 				break;
 		}
 		this.add(render);
@@ -50,10 +51,10 @@ public class FireEntity extends Entity {
 		RenderComponent render = new RenderComponent();
 		switch (extension) {
 			case HORIZONTAL:
-				render.animation = new Animation<>(1f, Textures.bombHorizontal);
+				render.animation = new Animation<Sprite>(1f, Textures.bombHorizontal);
 				break;
 			case VERTICAL:
-				render.animation = new Animation<>(1f, Textures.bombVertical);
+				render.animation = new Animation<Sprite>(1f, Textures.bombVertical);
 				break;
 		}
 		this.add(render);

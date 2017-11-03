@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.proj.components.*;
 
@@ -29,7 +30,7 @@ public class PlayerEntity extends Entity implements InputProcessor {
     private final InputComponent input;
     public int lives = 5;
 
-    public PlayerEntity(float x, float y, Animation<TextureRegion> animation, InputConfiguration config) {
+    public PlayerEntity(float x, float y, Animation<Sprite> animation, InputConfiguration config) {
         this.config = config;
         RenderComponent render = new RenderComponent();
         render.animation = animation;

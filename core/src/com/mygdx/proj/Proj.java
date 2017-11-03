@@ -8,16 +8,18 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.proj.components.HitboxComponent;
-import com.mygdx.proj.entity.PlayerEntity;
+import com.mygdx.proj.entity.*;
 import com.mygdx.proj.systems.*;
 import com.mygdx.proj.util.BulletPositionUpdater;
 import com.mygdx.proj.util.MapLoader;
+import com.mygdx.proj.util.Mappers;
 import com.mygdx.proj.util.Textures;
 
 public class Proj extends ApplicationAdapter implements InputProcessor {
@@ -29,6 +31,8 @@ public class Proj extends ApplicationAdapter implements InputProcessor {
 	private FitViewport fitViewport;
 	private MapLoader mapLoader;
 	private BulletPositionUpdater bulletPositionUpdater;
+	private PlayerBulletSystem playerBulletSystem;
+	private BulletSystem bulletSystem;
 	public static Rectangle
 			physicalBorder1,
 			physicalBorder2,
@@ -43,10 +47,10 @@ public class Proj extends ApplicationAdapter implements InputProcessor {
 		batch = new SpriteBatch();
 		shape = new ShapeRenderer();
 		Textures.playerOneTexture = new Texture("player.one.png");
-		Textures.playerOneRegions = new TextureRegion[2];
+		Textures.playerOneRegions = new Sprite[2];
 		for (int i = 0; i < 2; i++)
 			Textures.playerOneRegions[i] =
-					new TextureRegion(Textures.playerOneTexture, i * 16, 0, 16, 16);
+					new Sprite(Textures.playerOneTexture, i * 16, 0, 16, 16);
 		Textures.playerOneAnimation =
 				new Animation<>(0.4f, Textures.playerOneRegions);
 
@@ -60,7 +64,7 @@ public class Proj extends ApplicationAdapter implements InputProcessor {
 */
 		Textures.obstacleTexture = new Texture("obstacle.png");
 		Textures.obstacleRegion =
-				new TextureRegion(Textures.obstacleTexture, 0, 0, 16, 16);
+				new Sprite(Textures.obstacleTexture, 0, 0, 16, 16);
 		Textures.obstacleAnimation =
 				new Animation<>(1f, Textures.obstacleRegion);
 
@@ -73,69 +77,206 @@ public class Proj extends ApplicationAdapter implements InputProcessor {
 				new Animation<>(0.4f, Textures.obstacleRegion);
 */
 		Textures.enemy1Texture = new Texture("Black and White Full (1).png");
-		Textures.enemy1Regions = new TextureRegion[2];
+		Textures.enemy1Regions = new Sprite[2];
 		for(int i = 0; i < 2; i++)
-			Textures.enemy1Regions[i] = new TextureRegion(Textures.enemy1Texture, i * 32, 27, 5, 5);
+			Textures.enemy1Regions[i] = new Sprite(Textures.enemy1Texture, i * 32, 0, 5, 5);
 		Textures.enemy1Animation =
 				new Animation<>(0.4f, Textures.enemy1Regions);
 
 		Textures.enemy2Texture = new Texture("Black and White Full (1).png");
-		Textures.enemy2Regions = new TextureRegion[2];
+		Textures.enemy2Regions = new Sprite[2];
 		for(int i = 0; i < 2; i++)
-			Textures.enemy2Regions[i] = new TextureRegion(Textures.enemy2Texture, i * 32, 17, 8, 8);
+			Textures.enemy2Regions[i] = new Sprite(Textures.enemy2Texture, i * 32, 7, 8, 8);
 		Textures.enemy2Animation =
 				new Animation<>(0.4f, Textures.enemy2Regions);
 
 		Textures.enemy3Texture = new Texture("Black and White Full (1).png");
-		Textures.enemy3Regions = new TextureRegion[2];
+		Textures.enemy3Regions = new Sprite[2];
 		for(int i = 0; i < 2; i++)
-			Textures.enemy3Regions[i] = new TextureRegion(Textures.enemy3Texture, i * 32, 2, 12, 12);
+			Textures.enemy3Regions[i] = new Sprite(Textures.enemy3Texture, i * 32, 18, 12, 12);
 		Textures.enemy3Animation =
 				new Animation<>(0.4f, Textures.enemy3Regions);
 
 		Textures.enemy4Texture = new Texture("Black and White Full (1).png");
-		Textures.enemy4Regions = new TextureRegion[2];
+		Textures.enemy4Regions = new Sprite[2];
 		for(int i = 0; i < 2; i++)
-			Textures.enemy4Regions[i] = new TextureRegion(Textures.enemy4Texture, i * 32, 2, 12, 12);
+			Textures.enemy4Regions[i] = new Sprite(Textures.enemy4Texture, 16 + (i * 32), 0, 16, 16);
 		Textures.enemy4Animation =
 				new Animation<>(0.4f, Textures.enemy4Regions);
 
 		Textures.enemy5Texture = new Texture("Black and White Full (1).png");
-		Textures.enemy5Regions = new TextureRegion[4];
+		Textures.enemy5Regions = new Sprite[4];
 		for(int i = 0; i < 4; i++)
-			Textures.enemy5Regions[i] = new TextureRegion(Textures.enemy5Texture, 16 + (i * 32), 16, 16, 16);
+			Textures.enemy5Regions[i] = new Sprite(Textures.enemy5Texture, 16 + (i * 32), 16, 16, 16);
 		Textures.enemy5Animation =
 				new Animation<>(0.4f, Textures.enemy5Regions);
 
-		Textures.enemyBossTexture = new Texture("Black and White and Red.png");
-		Textures.enemyBossRegions = new TextureRegion[4];
+		Textures.enemyBossTexture = new Texture("Black and White and Red 2x.png");
+		Textures.enemyBossRegions = new Sprite[4];
 		for(int i = 0; i < 4; i++)
-			Textures.enemyBossRegions[i] = new TextureRegion(Textures.enemyBossTexture, i * 33, 0, 32, 32);
+			Textures.enemyBossRegions[i] = new Sprite(Textures.enemyBossTexture, i * 64, 0, 64, 64);
 		Textures.enemyBossAnimation =
 				new Animation<>(0.4f, Textures.enemyBossRegions);
 
+		Textures.bullet1RedTexture = new Texture("Bullets Red.png");
+		Textures.bullet1RedRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet1RedRegions[i] = new Sprite(Textures.bullet1RedTexture, i * 32, 5, 5, 6);
+		Textures.bullet1RedAnimation =
+				new Animation<>(0.4f, Textures.bullet1RedRegions);
+		Textures.bullet2RedTexture = new Texture("Bullets Red.png");
+		Textures.bullet2RedRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet2RedRegions[i] = new Sprite(Textures.bullet2RedTexture, i * 32, 14, 5, 8);
+		Textures.bullet2RedAnimation =
+				new Animation<>(0.4f, Textures.bullet2RedRegions);
+		Textures.bullet3RedTexture = new Texture("Bullets Red.png");
+		Textures.bullet3RedRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet3RedRegions[i] = new Sprite(Textures.bullet3RedTexture, i * 32, 21, 6, 6);
+		Textures.bullet3RedAnimation =
+				new Animation<>(0.4f, Textures.bullet3RedRegions);
+		Textures.bullet4RedTexture = new Texture("Bullets Red.png");
+		Textures.bullet4RedRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet4RedRegions[i] = new Sprite(Textures.bullet4RedTexture, (i * 32) + 7, 26, 10, 10);
+		Textures.bullet4RedAnimation =
+				new Animation<>(0.4f, Textures.bullet4RedRegions);
+		Textures.bullet5RedTexture = new Texture("Bullets Red.png");
+		Textures.bullet5RedRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet5RedRegions[i] = new Sprite(Textures.bullet5RedTexture, (i * 32) + 10, 16, 18, 17);
+		Textures.bullet5RedAnimation =
+				new Animation<>(0.4f, Textures.bullet5RedRegions);
+
+		Textures.bullet1BlueTexture = new Texture("Bullets Blue.png");
+		Textures.bullet1BlueRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet1BlueRegions[i] = new Sprite(Textures.bullet1BlueTexture, i * 32, 5, 5, 6);
+		Textures.bullet1BlueAnimation =
+				new Animation<>(0.4f, Textures.bullet1BlueRegions);
+		Textures.bullet2BlueTexture = new Texture("Bullets Blue.png");
+		Textures.bullet2BlueRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet2BlueRegions[i] = new Sprite(Textures.bullet2BlueTexture, i * 32, 14, 5, 8);
+		Textures.bullet2BlueAnimation =
+				new Animation<>(0.4f, Textures.bullet2BlueRegions);
+		Textures.bullet3BlueTexture = new Texture("Bullets Blue.png");
+		Textures.bullet3BlueRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet3BlueRegions[i] = new Sprite(Textures.bullet3BlueTexture, i * 32, 21, 6, 6);
+		Textures.bullet3BlueAnimation =
+				new Animation<>(0.4f, Textures.bullet3BlueRegions);
+		Textures.bullet4BlueTexture = new Texture("Bullets Blue.png");
+		Textures.bullet4BlueRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet4BlueRegions[i] = new Sprite(Textures.bullet4BlueTexture, (i * 32) + 7, 26, 10, 10);
+		Textures.bullet4BlueAnimation =
+				new Animation<>(0.4f, Textures.bullet4BlueRegions);
+		Textures.bullet5BlueTexture = new Texture("Bullets Blue.png");
+		Textures.bullet5BlueRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet5BlueRegions[i] = new Sprite(Textures.bullet5BlueTexture, (i * 32) + 10, 16, 18, 17);
+		Textures.bullet5BlueAnimation =
+				new Animation<>(0.4f, Textures.bullet5BlueRegions);
+
+		Textures.bullet1GreenTexture = new Texture("Bullets Green.png");
+		Textures.bullet1GreenRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet1GreenRegions[i] = new Sprite(Textures.bullet1GreenTexture, i * 32, 5, 5, 6);
+		Textures.bullet1GreenAnimation =
+				new Animation<>(0.4f, Textures.bullet1GreenRegions);
+		Textures.bullet2GreenTexture = new Texture("Bullets Green.png");
+		Textures.bullet2GreenRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet2GreenRegions[i] = new Sprite(Textures.bullet2GreenTexture, i * 32, 14, 5, 8);
+		Textures.bullet2GreenAnimation =
+				new Animation<>(0.4f, Textures.bullet2GreenRegions);
+		Textures.bullet3GreenTexture = new Texture("Bullets Green.png");
+		Textures.bullet3GreenRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet3GreenRegions[i] = new Sprite(Textures.bullet3GreenTexture, i * 32, 21, 6, 6);
+		Textures.bullet3GreenAnimation =
+				new Animation<>(0.4f, Textures.bullet3GreenRegions);
+		Textures.bullet4GreenTexture = new Texture("Bullets Green.png");
+		Textures.bullet4GreenRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet4GreenRegions[i] = new Sprite(Textures.bullet4GreenTexture, (i * 32) + 7, 26, 10, 10);
+		Textures.bullet4GreenAnimation =
+				new Animation<>(0.4f, Textures.bullet4GreenRegions);
+		Textures.bullet5GreenTexture = new Texture("Bullets Green.png");
+		Textures.bullet5GreenRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet5GreenRegions[i] = new Sprite(Textures.bullet5GreenTexture, (i * 32) + 10, 16, 18, 17);
+		Textures.bullet5GreenAnimation =
+				new Animation<>(0.4f, Textures.bullet5GreenRegions);
+
+		Textures.bullet1PurpleTexture = new Texture("Bullets Purple.png");
+		Textures.bullet1PurpleRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet1PurpleRegions[i] = new Sprite(Textures.bullet1PurpleTexture, i * 32, 5, 5, 6);
+		Textures.bullet1PurpleAnimation =
+				new Animation<>(0.4f, Textures.bullet1PurpleRegions);
+		Textures.bullet2PurpleTexture = new Texture("Bullets Purple.png");
+		Textures.bullet2PurpleRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet2PurpleRegions[i] = new Sprite(Textures.bullet2PurpleTexture, i * 32, 14, 5, 8);
+		Textures.bullet2PurpleAnimation =
+				new Animation<>(0.4f, Textures.bullet2PurpleRegions);
+		Textures.bullet3PurpleTexture = new Texture("Bullets Purple.png");
+		Textures.bullet3PurpleRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet3PurpleRegions[i] = new Sprite(Textures.bullet3PurpleTexture, i * 32, 21, 6, 6);
+		Textures.bullet3PurpleAnimation =
+				new Animation<>(0.4f, Textures.bullet3PurpleRegions);
+		Textures.bullet4PurpleTexture = new Texture("Bullets Purple.png");
+		Textures.bullet4PurpleRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet4PurpleRegions[i] = new Sprite(Textures.bullet4PurpleTexture, (i * 32) + 7, 26, 10, 10);
+		Textures.bullet4PurpleAnimation =
+				new Animation<>(0.4f, Textures.bullet4PurpleRegions);
+		Textures.bullet5PurpleTexture = new Texture("Bullets Purple.png");
+		Textures.bullet5PurpleRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet5PurpleRegions[i] = new Sprite(Textures.bullet5PurpleTexture, (i * 32) + 10, 16, 18, 17);
+		Textures.bullet5PurpleAnimation =
+				new Animation<>(0.4f, Textures.bullet5PurpleRegions);
+
+		Textures.bullet1PlayerTexture = new Texture("Bullets Yellow (2).png");
+		Textures.bullet1PlayerRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet1PlayerRegions[i] = new Sprite(Textures.bullet1PlayerTexture, i * 16, 0, 7, 6);
+		Textures.bullet1PlayerAnimation =
+				new Animation<>(0.4f, Textures.bullet1PlayerRegions);
+		Textures.bullet2PlayerTexture = new Texture("Bullets Yellow (2).png");
+		Textures.bullet2PlayerRegions = new Sprite[2];
+		for(int i = 0; i < 2; i++)
+			Textures.bullet2PlayerRegions[i] = new Sprite(Textures.bullet2PlayerTexture, i * 16, 6, 5, 6);
+		Textures.bullet2PlayerAnimation =
+				new Animation<>(0.4f, Textures.bullet2PlayerRegions);
+
 		Textures.bombTexture = new Texture("bomb.png");
-		Textures.bombRegions = new TextureRegion[2];
+		Textures.bombRegions = new Sprite[2];
 		for (int i = 0; i < 2; i++)
 			Textures.bombRegions[i] =
-					new TextureRegion(Textures.bombTexture, i * 16, 0, 16, 16);
+					new Sprite(Textures.bombTexture, i * 16, 0, 16, 16);
 		Textures.bombAnimation =
 				new Animation<>(0.2f, Textures.bombRegions);
 
 		Textures.bombCenter =
-				new TextureRegion(Textures.bombTexture, 2 * 16, 0, 16, 16);
+				new Sprite(Textures.bombTexture, 2 * 16, 0, 16, 16);
 		Textures.bombUp =
-				new TextureRegion(Textures.bombTexture, 3 * 16, 0, 16, 16);
+				new Sprite(Textures.bombTexture, 3 * 16, 0, 16, 16);
 		Textures.bombDown =
-				new TextureRegion(Textures.bombTexture, 4 * 16, 0, 16, 16);
+				new Sprite(Textures.bombTexture, 4 * 16, 0, 16, 16);
 		Textures.bombLeft =
-				new TextureRegion(Textures.bombTexture, 5 * 16, 0, 16, 16);
+				new Sprite(Textures.bombTexture, 5 * 16, 0, 16, 16);
 		Textures.bombRight =
-				new TextureRegion(Textures.bombTexture, 6 * 16, 0, 16, 16);
+				new Sprite(Textures.bombTexture, 6 * 16, 0, 16, 16);
 		Textures.bombVertical =
-				new TextureRegion(Textures.bombTexture, 7 * 16, 0, 16, 16);
+				new Sprite(Textures.bombTexture, 7 * 16, 0, 16, 16);
 		Textures.bombHorizontal =
-				new TextureRegion(Textures.bombTexture, 8 * 16, 0, 16, 16);
+				new Sprite(Textures.bombTexture, 8 * 16, 0, 16, 16);
 	}
 
 	private boolean restart = false;
@@ -146,6 +287,11 @@ public class Proj extends ApplicationAdapter implements InputProcessor {
 		world.addSystem(new BombSystem());
 		world.addSystem(new ExplosionSystem());
 		world.addSystem(new DestructionSystem());
+		world.addSystem(new SpawnSystem());
+		world.addSystem(new PlayerBulletSystem());
+		world.addSystem(new BulletSystem());
+		world.addSystem(new BulletMovementSystem());
+		world.addSystem(new StageSystem());
 		world.addEntityListener(new EntityListener() {
 			@Override
 			public void entityAdded(Entity entity) {
@@ -198,6 +344,7 @@ public class Proj extends ApplicationAdapter implements InputProcessor {
 						Input.Keys.SPACE
 				));*/
 		world.addEntity(playerOne);
+		BulletMovementSystem.playerUpdate(Mappers.hitboxMapper.get(playerOne), Mappers.positionMapper.get(playerOne));
 		//world.addEntity(playerTwo);
 
 		//mapLoader.createEntities(world);
@@ -210,7 +357,12 @@ public class Proj extends ApplicationAdapter implements InputProcessor {
 		fitViewport.apply();
 
 		camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+
 	}
+
+
+
+
 
 	@Override
 	public void create() {

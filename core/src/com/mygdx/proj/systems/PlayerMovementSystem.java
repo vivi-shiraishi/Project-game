@@ -76,6 +76,7 @@ public class PlayerMovementSystem extends MovementSystem{
                 }
             }
         }
+        BulletMovementSystem.playerUpdate(hitbox, position);
         Pools.rectPool.free(playerHitbox);
     }
 }

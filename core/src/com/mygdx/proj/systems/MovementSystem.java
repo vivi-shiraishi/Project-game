@@ -6,10 +6,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Rectangle;
-import com.mygdx.proj.components.HitboxComponent;
-import com.mygdx.proj.components.InputComponent;
-import com.mygdx.proj.components.PositionComponent;
-import com.mygdx.proj.components.StaticColliderComponent;
+import com.mygdx.proj.components.*;
 import com.mygdx.proj.util.*;
 
 public class MovementSystem extends IteratingSystem {
@@ -18,7 +15,7 @@ public class MovementSystem extends IteratingSystem {
     private Family collisionFamily;
     private ImmutableArray<Entity> collisionEntities;
 
-    public MovementSystem() {
+    MovementSystem() {
         super(Family
                 .all(PositionComponent.class,
                         InputComponent.class,
@@ -36,7 +33,6 @@ public class MovementSystem extends IteratingSystem {
         super.addedToEngine(engine);
         collisionEntities = getEngine().getEntitiesFor(collisionFamily);
         playerPositionUpdater.collisionEntities = collisionEntities;
-        bulletPositionUpdater.collisionEntities = collisionEntities;
     }
 
     @Override
@@ -51,7 +47,6 @@ public class MovementSystem extends IteratingSystem {
     }
 
     PlayerPositionUpdater playerPositionUpdater = new PlayerPositionUpdater(collisionEntities);
-    BulletPositionUpdater bulletPositionUpdater = new BulletPositionUpdater(collisionEntities);
 
 
 }

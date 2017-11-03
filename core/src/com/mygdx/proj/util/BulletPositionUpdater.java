@@ -34,7 +34,6 @@ public class BulletPositionUpdater extends PositionUpdater{
         px = position.x + (float)(Math.cos(angle) * dist);
         bulletHitbox.setY(py);
         bulletHitbox.setX(px);
-
     }
 
     public void moveStraight(PositionComponent position, Rectangle bulletHitbox, Rectangle playerHitbox , float angle, float dist){
@@ -48,6 +47,7 @@ public class BulletPositionUpdater extends PositionUpdater{
                         bulletHitbox.overlaps(despawnBorder3) ||
                         bulletHitbox.overlaps(despawnBorder4)) {
                 destructionSystem.getEngine().removeEntity(bullet);
+                System.out.println("R");
                 return;
             }
         }

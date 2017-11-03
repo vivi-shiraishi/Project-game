@@ -27,4 +27,8 @@ public class Mappers {
     public static final ComponentMapper<DestroyComponent>
             destroyMapper =
             ComponentMapper.getFor(DestroyComponent.class);
+
+    public static final ComponentMapper<BehaviourComponent>
+            behaviourMapper =
+            ComponentMapper.getFor(BehaviourComponent.class);
 }
